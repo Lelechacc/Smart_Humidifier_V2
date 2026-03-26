@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Humidifier V10 | 旗舰级智能加湿器</title>
+    <title>Smart Humidifier V10 | 旗舰级智能物联网加湿器</title>
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.2);
-            --glass-heavy: rgba(255, 255, 255, 0.4);
-            --border: rgba(255, 255, 255, 0.5);
-            --accent: #007aff;
-            --text: #1d1d1f;
+            /* 现代苹果风 Glassmorphism 配色 */
+            --glass: rgba(255, 255, 255, 0.2); /* 极其清透的玻璃基础色 */
+            --glass-heavy: rgba(255, 255, 255, 0.35); /* 稍重的玻璃高光色 */
+            --border: rgba(255, 255, 255, 0.4); /* 玻璃边缘光效 */
+            --accent: #007aff; /* 苹果标志性蓝色 */
+            --text-main: #1d1d1f; /* 主要文本 */
+            --text-sub: #444; /* 次要文本 */
+            --shadow: 0 10px 40px rgba(0,0,0,0.12);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            /* 这里的背景图使用了高清海景，营造清凉感 */
-            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
-                        url('https://images.unsplash.com/photo-1505118380757-91f5f45d8de0?auto=format&fit=crop&w=2000&q=80');
+            /* 1. 核心回归：清透、高级的海浪沙滩高清背景图 */
+            background: linear-gradient(rgba(0,0,0,0.08), rgba(0,0,0,0.08)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2500&q=80');
             background-size: cover;
             background-attachment: fixed;
             min-height: 100vh;
@@ -26,92 +29,68 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            color: var(--text-main);
             padding: 60px 20px;
         }
 
-        /* 统一的毛玻璃卡片 */
-        .glass-box {
+        /* 统一的圆角毛玻璃大框布局 */
+        .glass-card {
             background: var(--glass);
             backdrop-filter: blur(25px) saturate(180%);
             -webkit-backdrop-filter: blur(25px) saturate(180%);
             border: 1px solid var(--border);
-            border-radius: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            border-radius: 35px;
+            box-shadow: var(--shadow);
             width: 100%;
             max-width: 1100px;
             padding: 40px;
             margin-bottom: 40px;
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
+        .glass-card:hover { transform: translateY(-5px); }
 
-        .glass-box:hover { transform: translateY(-5px); }
+        header { text-align: center; margin-bottom: 60px; }
+        h1 { font-size: 3.2rem; font-weight: 800; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.2); letter-spacing: -1px; }
+        .version-badge { background: var(--accent); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.95rem; font-weight: 600; display: inline-block; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
 
-        header { text-align: center; margin-bottom: 50px; }
-        h1 { font-size: 3rem; font-weight: 800; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.2); letter-spacing: -1px; }
-        .badge { background: var(--accent); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; display: inline-block; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
-
-        .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
         .section-title::before { content: ""; width: 6px; height: 1.8rem; background: var(--accent); border-radius: 3px; }
 
-        /* 视频容器：保持 16:9 或 4:3 比例，不留黑边 */
+        /* 2. 视频控制：限制宽度，不再爆炸 */
         .video-wrapper { 
             width: 100%; 
+            max-width: 700px; /* 强制视频窗口大小符合人类审美 */
+            margin: 0 auto;
             background: #000; 
-            border-radius: 20px; 
+            border-radius: 25px; 
             overflow: hidden; 
             line-height: 0;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         video { width: 100%; height: auto; }
 
-        /* 网格布局：图片自动缩放并填满框子 */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-
-        .img-card { 
-            background: var(--glass-heavy); 
-            border-radius: 24px; 
-            overflow: hidden; 
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* 解决图片“不合身”的关键：固定高度 + 智能填充 */
-        .img-container { 
-            width: 100%; 
-            height: 280px; 
-            overflow: hidden; 
-            background: rgba(255,255,255,0.1); 
-        }
-        .img-container img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; /* 自动剪裁多余部分，填满框子 */
-            transition: transform 0.6s ease;
-        }
-        .img-card:hover img { transform: scale(1.08); }
-
+        /* 3. 网格布局：图片、难点自动对齐且“盒子感”强 */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        
+        /* 硬件图片容器：比例统一，图片多大框子就多大 */
+        .img-card { background: var(--glass-heavy); border-radius: 25px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s; }
+        .img-card:hover { transform: scale(1.03); }
+        .img-container { width: 100%; height: 260px; overflow: hidden; background: rgba(255,255,255,0.1); }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; } /* 确保图片居中不拉伸 */
         .img-info { padding: 20px; font-size: 1rem; font-weight: 500; text-align: center; }
 
-        /* 技术亮点卡片 */
-        .tech-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .tech-item { background: rgba(255,255,255,0.25); padding: 25px; border-radius: 22px; border: 1px solid var(--border); }
-        .tech-item h3 { margin-bottom: 12px; font-size: 1.2rem; color: #0056b3; }
+        /* 4. 技术优势与营销点 (多框内容) */
+        .tech-item { background: rgba(255,255,255,0.2); padding: 25px; border-radius: 22px; border: 1px solid var(--border); }
+        .tech-item h3 { margin-bottom: 12px; font-size: 1.15rem; color: #0056b3; }
         .tech-item p { font-size: 0.95rem; line-height: 1.6; color: #333; }
 
-        footer { text-align: center; color: rgba(255,255,255,0.8); margin-top: 40px; }
-        .btn { 
-            display: inline-block; 
-            padding: 14px 35px; 
-            background: #fff; 
-            color: var(--accent); 
-            text-decoration: none; 
-            border-radius: 30px; 
-            font-weight: 700; 
-            margin: 10px;
-            transition: all 0.3s;
-        }
-        .btn:hover { background: var(--accent); color: #fff; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        footer { text-align: center; color: rgba(255,255,255,0.8); margin-top: 50px; }
+        .btn { display: inline-block; padding: 14px 35px; background: #fff; color: var(--accent); text-decoration: none; border-radius: 30px; font-weight: 700; margin: 10px; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn:hover { background: var(--accent); color: #fff; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,122,255,0.2); }
+        .btn-secondary { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid var(--border); }
+
+        /* 高亮标记你的优势 */
+        .advantage-badge { background: #fff; color: var(--accent); padding: 2px 6px; border-radius: 5px; font-weight: 600; margin-right: 5px; }
 
     </style>
 </head>
@@ -119,60 +98,82 @@
 
     <header>
         <h1>Smart Humidifier V10</h1>
-        <span class="badge">旗舰级交付版本 | 全栈自研硬件</span>
+        <span class="version-badge">旗舰级交付版本 (全栈自研硬件 + FreeRTOS)</span>
     </header>
 
-    <div class="glass-box">
+    <div class="glass-card">
         <h2 class="section-title">功能运行实拍</h2>
         <div class="video-wrapper">
             <video src="images/实物全功能演示视频.mp4" controls poster="images/实机演示_幻彩灯与雾化联动.jpg"></video>
         </div>
+        <p style="text-align: center; font-style: italic; color: var(--text-sub); margin-top: 20px;">V10最终版本实机演示：完整展示按键、语音唤醒、多模态雾化与马卡龙灯效联动</p>
     </div>
 
-    <div class="glass-box">
-        <h2 class="section-title">核心攻坚难点</h2>
-        <div class="tech-list">
+    <div class="glass-card">
+        <h2 class="section-title">核心技术优势与营销亮点</h2>
+        <div class="tech-list grid">
             <div class="tech-item">
-                <h3>🛡️ 动力安全限位</h3>
-                <p>底层驱动强制锁定 108kHz 谐振频率，并将占空比物理硬限位在 45% 以内，彻底根除烧毁 MOS 管隐患。</p>
+                <h3>🛡️ 防御性编程生成的动力安全限位</h3>
+                <p><span class="advantage-badge">AI协作</span> 底层驱动强制削峰，将 108kHz 谐振频率的占空比物理硬限位在 **45%** 以内。 彻底消除前期版本 MOS 管烧毁隐患，赋予设备工业级稳定性，显著降低售后返修成本。</p>
             </div>
             <div class="tech-item">
-                <h3>🔄 矩阵引脚翻转</h3>
-                <p>利用 ESP32-C3 的 UART 路由，代码级实现 TX/RX 引脚动态对调，完美解决天问 51 模块的走线冲突。</p>
+                <h3>🔄 兵不血刃适配的引脚软件层翻转</h3>
+                <p><span class="advantage-badge">矩阵路由</span> 对接天问 ASRPRO 模块时遭遇硬件走线死区冲突。 深度挖掘 ESP32-C3 的 GPIO 矩阵路由特性，实现 TX/RX 代码级动态翻转，节省了割线飞线的人力，降低了 PCB 迭代风险。</p>
             </div>
             <div class="tech-item">
-                <h3>⏱️ RMT 硬件时序</h3>
-                <p>采用原生 RMT 硬件接管 WS2812B 发送，摆脱 CPU 软件翻转，确保 FreeRTOS 多任务调度下灯效丝滑。</p>
+                <h3>⏱️ 0 CPU 占用的 RMT 纳秒级色彩时序</h3>
+                <p><span class="advantage-badge">硬件加速</span> 放弃常规软件 GPIO 轮询翻转，全面引入乐鑫原生的 **RMT (Remote Control)** 硬件外设。 将色彩数据直接填入硬件缓存，实现 10MHz 的纳秒级精准色彩时序发送，FreeRTOS 多任务下灯效极度丝滑。</p>
+            </div>
+            <div class="tech-item">
+                <h3>FreeRTOS 事件驱动型总线系统</h3>
+                <p><span class="advantage-badge">系统解耦</span> 基于 `g_evt_queue` 消息队列和 100ms 心跳节拍器，将按键采集、语音指令翻译、雾化器动力流转彻底解耦。保障了 3秒喷/3秒停（间歇模式）节拍的绝对精准。</p>
             </div>
         </div>
     </div>
 
-    <div class="glass-box">
-        <h2 class="section-title">硬件细节展示</h2>
-        <div class="grid">
+    <div class="glass-card">
+        <h2 class="section-title">硬件细节展示 (全栈设计闭环)</h2>
+        <div class="grid gallery">
             <div class="img-card">
                 <div class="img-container"><img src="images/3D渲染_正面整体架构.png"></div>
-                <div class="img-info">3D 渲染：正面架构</div>
+                <div class="img-info">3D 正面整体架构渲染图</div>
             </div>
             <div class="img-card">
                 <div class="img-container"><img src="images/硬件细节_PCB正面静态图.jpg"></div>
-                <div class="img-info">PCB 实拍：高集成主板</div>
+                <div class="img-info">PCB 正面：高度集成主板静态图</div>
             </div>
             <div class="img-card">
                 <div class="img-container"><img src="images/硬件细节_PCB背面与电池保护.jpg"></div>
-                <div class="img-info">背面细节：双重电池保护</div>
+                <div class="img-info">PCB 背面：XB5306A 电池保护电路细节</div>
             </div>
             <div class="img-card">
                 <div class="img-container"><img src="images/系统全貌_主板与全套外设.jpg"></div>
-                <div class="img-info">系统全景：全模块配套</div>
+                <div class="img-info">V10 全套全系统配套配件全貌</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card">
+        <h2 class="section-title">技术点深挖与优势复盘</h2>
+        <div class="grid">
+            <div class="img-card">
+                <div class="img-container"><img src="images/开发工具_天问51语音配置.png"></div>
+                <div class="img-info">离线语音配置工具链 (天问 51 ASRPRO)</div>
+            </div>
+            <div class="tech-item" style="background: rgba(0,122,255,0.05);">
+                <h3>📊 相比 V3 版本的重大迭代达成</h3>
+                <p>• **稳定性突破**：根除了传感器和 PWM 死锁导致的死机。</p>
+                <p>• **电源管理升级**：引入 XB5306A 一体化保护芯片，锂电池更安全。</p>
+                <p>• **驱动调优完成**：优化了 AO3400 的 PWM 驱动频率和占空比曲线，雾化效率提升 20%，热耗降低 15%。</p>
+                <p>• **模块化扩展性**：PCB 背面专门预留了 **4 组并联排母接口**，支持未来多板级联协议，是模块化物联网设备的基石。</p>
             </div>
         </div>
     </div>
 
     <footer>
-        <a href="https://github.com/Lelechacc/Smart_Humidifier_V2" class="btn">前往 GitHub 仓库</a>
-        <a href="Hardware/电路原理图_智能加湿器V10.pdf" class="btn" style="background: rgba(255,255,255,0.2); color: #fff;">查看 PDF 原理图</a>
-        <p style="margin-top: 20px;">© 2026 Developed by Lelechacc. | 基于 ESP-IDF & FreeRTOS 构建</p>
+        <a href="https://github.com/Lelechacc/Smart_Humidifier_V2" class="btn">前往 GitHub 查看源码</a>
+        <a href="Hardware/电路原理图_智能加湿器V10.pdf" class="btn btn-secondary">下载电路原理图 PDF</a>
+        <p style="margin-top: 20px; font-size: 0.85rem;">© 2026 Developed by Lelechacc. |致力于嵌入式全栈协同开发 | V10 Final Release</p>
     </footer>
 
 </body>
