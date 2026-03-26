@@ -1,0 +1,6 @@
+# 告诉 GitHub 忽略 build 文件夹里的所有统计
+build/** linguist-vendored
+
+# 强制把所有的 .c 和 .h 文件识别为 C 语言
+*.c linguist-language=C
+*.h linguist-language=C
