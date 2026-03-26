@@ -1,78 +1,191 @@
-1. # 💧 智能物联网加湿器 V10 (全栈自研版)
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Humidifier V10 | 智能加湿器旗舰版</title>
+    <style>
+        :root {
+            /* 现代苹果风配色方案 */
+            --glass-bg: rgba(255, 255, 255, 0.25); /* 磨砂玻璃背景色 */
+            --glass-border: rgba(255, 255, 255, 0.35); /* 玻璃边框色 */
+            --accent-blue: #007aff; /* 苹果标志性蓝色 */
+            --main-text: #1d1d1f; /* 主要文本颜色 */
+            --sub-text: #666; /* 次要文本颜色 */
+        }
 
-   ![Platform](https://img.shields.io/badge/SoC-ESP32--C3-blue)
-   ![Framework](https://img.shields.io/badge/OS-FreeRTOS-lightgrey)
-   ![Hardware](https://img.shields.io/badge/EDA-JiaLiChuang-red)
-   ![AI-Workflow](https://img.shields.io/badge/AI%20Workflow-Cursor%20%7C%20Claude-8A2BE2)
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-   本项目是一个经历了从 V3 到 V10 深度迭代的全栈物联网设备。项目涵盖了从底层嘉立创 EDA 硬件画板、PCB 焊接调试，到顶层 FreeRTOS 软件架构设计的完整闭环。同时，本项目深度探索了 **AI 工具 (Cursor/Claude) 在嵌入式防御性编程与架构重构中的协同价值**。
+        body {
+            /* 使用高清海浪沙滩背景图，确保视觉清凉感 */
+            background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: var(--main-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 50px 20px;
+        }
 
-   👉 **[点击查看：项目实机演示与技术复盘主页 (Apple 拟物风)](#)** *(网页端即将上线)*
+        /* 磨砂玻璃主容器 */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1200px;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+        }
 
-   ---
+        /* 顶部导航与标题 */
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 2.8rem; font-weight: 700; margin-bottom: 10px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .version-badge { background: var(--accent-blue); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; display: inline-block; }
 
-   ## 📺 实机运行与系统全貌 (Showcase)
+        /* 核心内容区 */
+        .content-main { display: flex; gap: 40px; margin-bottom: 40px; flex-wrap: wrap; }
 
-   <div align="center">
-     <video src="images/实物全功能演示视频.mp4" width="100%" controls poster="images/实机演示_幻彩灯与雾化联动.jpg">
-       您的浏览器不支持播放该视频，请在仓库中直接下载查看。
-     </video>
-     <p><i>▶️ V10 最终交付版：完整演示按键切换、语音唤醒、多模态雾化与马卡龙灯效联动</i></p>
-   </div>
+        /* 左侧视频区域 */
+        .showcase-video { flex: 2; min-width: 350px; background: rgba(0,0,0,0.1); border-radius: 25px; overflow: hidden; }
+        .showcase-video video { width: 100%; display: block; border-radius: 20px; }
 
-   |                  硬件正面静态 (高度集成)                  |                硬件背面细节 (电池保护与焊接)                 |
-   | :-------------------------------------------------------: | :----------------------------------------------------------: |
-   | <img src="images/硬件细节_PCB正面静态图.jpg" width="400"> | <img src="images/硬件细节_PCB背面与电池保护.jpg" width="400"> |
-   |  <img src="images/3D渲染_正面整体架构.png" width="400">   |  <img src="images/系统全貌_主板与全套外设.jpg" width="400">  |
+        /* 右侧技术说明 (也采用玻璃框) */
+        .technical-specs { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .spec-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 25px;
+            transition: 0.3s ease;
+        }
+        .spec-card:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-3px); }
+        .spec-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 10px; }
+        .spec-card p { font-size: 0.95rem; line-height: 1.6; color: rgba(0,0,0,0.7); }
 
-   > 📎 **[核心开源资料：点击查看完整自研电路原理图 PDF (V10 版本)](Hardware/电路原理图_智能加湿器V10.pdf)**
+        /* 硬件画廊区域 */
+        .hardware-gallery { margin-bottom: 40px; }
+        .hardware-gallery h2 { font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; font-weight: 600; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        
+        /* 硬件图片容器 (完美的圆角框) */
+        .gallery-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s ease;
+        }
+        .gallery-item:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .gallery-item img { width: 100%; height: 250px; object-fit: cover; display: block; } /* 确保图片完美贴合 */
+        .gallery-item p { padding: 15px; text-align: center; font-size: 0.9rem; color: rgba(0,0,0,0.7); font-style: italic; }
 
-   ---
+        /* 底部下载与版权 */
+        footer { text-align: center; border-top: 1px solid var(--glass-border); padding-top: 30px; margin-top: auto; }
+        .btn-center { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
+        .btn { padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: 0.3s; }
+        .btn-primary { background: #fff; color: var(--accent-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-primary:hover { background: #f5f5f7; transform: translateY(-2px); }
+        .btn-secondary { background: rgba(0,0,0,0.1); color: #fff; }
+        .btn-secondary:hover { background: rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
 
-   ## ⚔️ 核心技术攻坚与解决方案 (Technical Challenges)
+    <div class="glass-panel">
+        
+        <header>
+            <h1>Smart Humidifier V10</h1>
+            <span class="version-badge">最终交付稳定版 (全栈自研)</span>
+        </header>
 
-   在开发过程中，为实现系统的工业级稳定性，重点攻克了以下四大技术难点：
+        <div class="content-main">
+            
+            <div class="showcase-video">
+                <video src="images/实物全功能演示视频.mp4" controls poster="images/实机演示_幻彩灯与雾化联动.jpg"></video>
+            </div>
 
-   ### 1. 高频功率安全与 MOS 管过热保护 (硬件+软件双重防御)
-   - **痛点**：微孔雾化片依赖 108kHz 的超声波谐振驱动，初期测试时长时间高功率输出极易烧毁 MOS 管和功率电感。
-   - **攻坚**：采用 ESP32-C3 的 LEDC 外设生成精准 108kHz 硬件 PWM。在 AI 辅助下引入**“软件硬限位”防御性编程**，在 `bsp_atomizer.c` 底层中，无论业务逻辑传入多大数值，PWM 占空比被绝对削峰并锁定在 135 (45%) 以下，并加入了零电平安全启动机制，彻底根除烧毁隐患。
+            <aside class="technical-specs">
+                <div class="spec-card">
+                    <h3>🛡️ 防御性功率锁定</h3>
+                    <p>底层驱动强制定格 108kHz 硬件 PWM 频率，并绝对限制占空比低于 45% (135)，配合零电平启动逻辑，彻底杜绝硬件烧毁隐患。</p>
+                </div>
+                <div class="spec-card">
+                    <h3>🔄 协议引脚翻转</h3>
+                    <p>利用 ESP32-C3 的 UART 矩阵路由技术，实现了 GPIO 物理职责翻转 (TX/RX 对调)，兵不血刃适配第三方离线语音模块走线死区。</p>
+                </div>
+                <div class="spec-card">
+                    <h3>⏱️ RMT 硬件时序驱动</h3>
+                    <p>全面引入原生 RMT 硬件接管 WS2812B 色彩发送，告别 CPU 轮询翻转，确保 FreeRTOS 多任务调度下灯效丝滑不卡顿。</p>
+                </div>
+            </aside>
 
-   ### 2. 第三方语音模块的硬件走线死区 (UART 矩阵路由)
-   ![语音配置](images/开发工具_天问51语音配置.png)
-   - **痛点**：对接“天问 51 (ASRPRO)”时，编辑器强制其发送端(TX)为 PA2，接收端(RX)为 PA3，但这与我们自研 PCB 的物理走线产生了交叉冲突。
-   - **攻坚**：放弃飞线妥协。深入研究 ESP32-C3 的 GPIO 矩阵映射原理，在 `bsp_voice.c` 中使用 `uart_set_pin(UART_NUM_1, 20, 21...)` 实现了 **TX/RX 物理引脚职责的软件层动态翻转**，兵不血刃地完成了协议适配。
+        </div>
 
-   ### 3. 幻彩灯光时序苛刻导致系统卡顿 (RMT 纳秒级驱动)
-   - **痛点**：WS2812B 对时序要求达到纳秒级，传统 GPIO 翻转会受 FreeRTOS 任务调度打断，导致灯珠闪烁、主循环卡顿。
-   - **攻坚**：舍弃常规写法，引入 ESP-IDF 官方推荐的 **RMT (Remote Control) 外设硬件接口**。像“录音机”一样将色彩数组一次性写入 RMT 硬件缓存，由硬件独立发送 10MHz 时序波形，实现 0 CPU 占用的全彩平滑过渡。
+        <section class="hardware-gallery">
+            <h2>硬件展示与系统全貌</h2>
+            <div class="gallery-grid">
+                
+                <div class="gallery-item">
+                    <img src="images/3D渲染_正面整体架构.png" alt="3D正面整体架构">
+                    <p>嘉立创 EDA 3D 渲染正面整体架构</p>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="images/硬件细节_PCB正面静态图.jpg" alt="硬件细节_PCB正面静态图">
+                    <p>PCB 正面高度集成静态图</p>
+                </div>
 
-   ### 4. 复杂业务逻辑的多并发冲突 (FreeRTOS 事件驱动总线)
-   - **痛点**：按键轮询、语音中断、定时器与雾化器状态机容易产生竞态条件。
-   - **攻坚**：设计 `task_main_controller` 核心指挥官任务。构建 100ms 心跳节拍器，所有外设输入（长短按、UART 指令）统统打包为 Event ID 丢入 `g_evt_queue` 消息队列。彻底实现**“采集与执行解耦”**，确保了 3秒喷/3秒停（间歇模式）节拍的绝对精准。
+                <div class="gallery-item">
+                    <img src="images/硬件细节_PCB背面与电池保护.jpg" alt="硬件细节_PCB背面与电池保护">
+                    <p>PCB 背面：双重电池保护电路细节</p>
+                </div>
 
-   ---
+                <div class="gallery-item">
+                    <img src="images/系统全貌_主板与全套外设.jpg" alt="系统全貌_主板与全套外设">
+                    <p>V10 最终版系统全套配件全貌</p>
+                </div>
 
-   ## ⚙️ 系统元器件与架构矩阵
+            </div>
+        </section>
 
-   | 模块分类     | 核心选型 / 技术方案    | 作用说明                                      |
-   | :----------- | :--------------------- | :-------------------------------------------- |
-   | **主控大脑** | ESP32-C3FN4            | RISC-V 核心，自带 4MB Flash，负责多任务调度   |
-   | **电源系统** | TC4056A + XB5306A      | 线性充电管理与锂电池一体化双重保护电路        |
-   | **交互输入** | 物理按键 + 天问 ASRPRO | 支持 GPIO 中断级长/短按，支持离线绝对语音指令 |
-   | **视觉反馈** | WS2812B + 3路状态 LED  | 马卡龙色调动态反馈 + 灌电流模式单色指示       |
-   | **动力输出** | AO3400 + XR8*10-300K   | MOSFET 驱动功率电感，108kHz 高频超声波谐振    |
+        <section class="hardware-gallery">
+            <h2>开源资源与打板资料</h2>
+            <div class="gallery-grid">
+                
+                <div class="gallery-item">
+                    <img src="images/开发工具_天问51语音配置.png" alt="开发工具_天问51语音配置">
+                    <p>离线语音配置工具链展示 (ASRPRO)</p>
+                </div>
+                
+                <div class="gallery-item" style="background: rgba(0,122,255,0.05);">
+                    <div style="padding: 50px 20px; text-align: center;">
+                        <h3 style="color: var(--accent-blue);">📎 V10 Gerber (打板文件)</h3>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">已上传，广大网友可直接下载使用。</p>
+                    </div>
+                    <p>位于 Hardware/ 目录下的核心 Gerber 压缩包</p>
+                </div>
+            </div>
+        </section>
 
-   ---
+        <footer>
+            <div class="btn-center">
+                <a href="https://github.com/Lelechacc/Smart_Humidifier_V2" class="btn btn-primary">查看 GitHub 源码</a>
+                <a href="Hardware/电路原理图_智能加湿器V10.pdf" class="btn btn-secondary">下载原理图 PDF</a>
+            </div>
+            <p style="margin-top: 30px; font-size: 0.8rem; color: rgba(0,0,0,0.6);">© 2026 Developed by Lelechacc. |致力于嵌入式全栈协同开发 | V10 Final Release</p>
+        </footer>
 
-   ## 🚀 后续演进计划 (Future Roadmap)
+    </div>
 
-   - [ ] **并联扩展协同**：V10 版 PCB 背面已预留了 **4 组并联排母接口**，计划在 V11 引入多板级联协议，支持温湿度传感器阵列的分布式接入。
-   - [ ] **原生蓝牙 App 联控**：代码底层已预留 BLE 蓝牙广播接口，计划开发配套的微信小程序，实现手机端动态调节雾量曲线。
-   - [ ] **OTA 远程升级**：利用 ESP32-C3 的原生特性，加入通过 Wi-Fi 下发固件的热更新功能。
-
-   ---
-
-   ## ⚠️ 授权与防伪声明 (License)
-   1. 本项目所有源码（含深度的中文架构注释）、硬件电路图、演示视频均为作者原创。
-   2. 严禁任何形式的“简历造假 (Resume Fraud)”或未经授权的商业挪用。
-   3. 拥抱开源，学习交流引用本项目思路或代码时，请务必在显著位置保留原作者署名。
+</body>
+</html>
