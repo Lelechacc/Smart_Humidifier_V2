@@ -1,75 +1,179 @@
-# 💧 智能物联网加湿器 V10 (全栈自研旗舰版)
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Humidifier V10 | 旗舰级智能加湿器</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.2);
+            --glass-heavy: rgba(255, 255, 255, 0.4);
+            --border: rgba(255, 255, 255, 0.5);
+            --accent: #007aff;
+            --text: #1d1d1f;
+        }
 
-<div align="center">
-  <img src="https://img.shields.io/badge/SoC-ESP32--C3-blue?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/OS-FreeRTOS-lightgrey?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Hardware-JiaLiChuang-red?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Workflow-AI%20Collaborated-8A2BE2?style=for-the-badge" />
-</div>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            /* 这里的背景图使用了高清海景，营造清凉感 */
+            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+                        url('https://images.unsplash.com/photo-1505118380757-91f5f45d8de0?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px;
+        }
 
----
+        /* 统一的毛玻璃卡片 */
+        .glass-box {
+            background: var(--glass);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            width: 100%;
+            max-width: 1100px;
+            padding: 40px;
+            margin-bottom: 40px;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
 
-## 📺 硬件风采与系统全貌 (Visual Showcase)
+        .glass-box:hover { transform: translateY(-5px); }
 
-<table align="center">
-  <tr>
-    <td align="center" width="500">
-      <b>📸 实机运行 (幻彩与雾化联动)</b><br>
-      <img src="images/实机演示_幻彩灯与雾化联动.jpg" width="480"><br>
-      <i>108kHz 驱动下稳定出雾，WS2812B 提供动态反馈</i>
-    </td>
-    <td align="center" width="500">
-      <b>🔍 硬件细节 (PCB 背面与焊接)</b><br>
-      <img src="images/硬件细节_PCB背面与电池保护.jpg" width="480"><br>
-      <i>展示自研 PCB 背面走线与电池保护电路细节</i>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="500">
-      <b>🎨 3D 建模 (正面架构)</b><br>
-      <img src="images/3D渲染_正面整体架构.png" width="480"><br>
-      <i>高度集成的双层板设计，合理的元器件热力分布</i>
-    </td>
-    <td align="center" width="500">
-      <b>📦 系统全景 (全套外设)</b><br>
-      <img src="images/系统全貌_主板与全套外设.jpg" width="480"><br>
-      <i>V10 最终版配套：主控板、电池、天问语音及雾化模组</i>
-    </td>
-  </tr>
-</table>
+        header { text-align: center; margin-bottom: 50px; }
+        h1 { font-size: 3rem; font-weight: 800; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.2); letter-spacing: -1px; }
+        .badge { background: var(--accent); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; display: inline-block; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
 
----
+        .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ""; width: 6px; height: 1.8rem; background: var(--accent); border-radius: 3px; }
 
-## ⚔️ 核心技术攻坚 (Technical Deep Dive)
+        /* 视频容器：保持 16:9 或 4:3 比例，不留黑边 */
+        .video-wrapper { 
+            width: 100%; 
+            background: #000; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            line-height: 0;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        video { width: 100%; height: auto; }
 
-本项目的代码逻辑并非简单的功能堆砌，而是针对嵌入式底层难点进行的深度优化：
+        /* 网格布局：图片自动缩放并填满框子 */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
 
-### 1. 🛡️ 硬件级动力安全限位 (Power Safety)
-* **难点**：微孔雾化片谐振频率为 **108kHz**。若 PWM 功率过载，MOS 管极易击穿。
-* **对策**：在 `bsp_atomizer.c` 中通过 AI 协同构建防御逻辑。无论上层指令如何变换，占空比均被物理锁定在 **45% (数值 135)** 以下，从根源保护 PCB 电感不发烫、不烧毁。
+        .img-card { 
+            background: var(--glass-heavy); 
+            border-radius: 24px; 
+            overflow: hidden; 
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
 
-### 2. 🔄 串口引脚“乾坤大挪移” (UART Matrix)
-* **难点**：对接“天问 ASRPRO”模块时，遭遇硬件引脚走线交叉冲突，常规方法需割线飞线。
-* **对策**：利用 ESP32-C3 的 **GPIO 矩阵路由** 特性，在 `bsp_voice.c` 中调用 `uart_set_pin()` 将 **TX/RX 职责进行代码级翻转**，优雅解决硬件死区。
+        /* 解决图片“不合身”的关键：固定高度 + 智能填充 */
+        .img-container { 
+            width: 100%; 
+            height: 280px; 
+            overflow: hidden; 
+            background: rgba(255,255,255,0.1); 
+        }
+        .img-container img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; /* 自动剪裁多余部分，填满框子 */
+            transition: transform 0.6s ease;
+        }
+        .img-card:hover img { transform: scale(1.08); }
 
-### 3. ⏱️ 纳秒级 RMT 信号发生器 (WS2812B)
-* **难点**：传统 GPIO 翻转受 FreeRTOS 任务调度干扰，会导致幻彩灯珠闪烁或死机。
-* **对策**：引入 **RMT (远程控制) 硬件外设**。将色彩数据直接填入硬件缓存，由底层硬件精准发送时序，实现 **0 CPU 占用** 的极速响应。
+        .img-info { padding: 20px; font-size: 1rem; font-weight: 500; text-align: center; }
 
----
+        /* 技术亮点卡片 */
+        .tech-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .tech-item { background: rgba(255,255,255,0.25); padding: 25px; border-radius: 22px; border: 1px solid var(--border); }
+        .tech-item h3 { margin-bottom: 12px; font-size: 1.2rem; color: #0056b3; }
+        .tech-item p { font-size: 0.95rem; line-height: 1.6; color: #333; }
 
-## 🧩 扩展性与未来演进 (Future Roadmap)
+        footer { text-align: center; color: rgba(255,255,255,0.8); margin-top: 40px; }
+        .btn { 
+            display: inline-block; 
+            padding: 14px 35px; 
+            background: #fff; 
+            color: var(--accent); 
+            text-decoration: none; 
+            border-radius: 30px; 
+            font-weight: 700; 
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover { background: var(--accent); color: #fff; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
-* **模块化接口**：PCB 背面专门预留了 **4 组并联排母接口**，支持后续多板级联与分布式传感器阵列接入。
-* **软件架构**：基于 **FreeRTOS 事件队列**，已预留原生蓝牙 BLE 协议栈接口。
+    </style>
+</head>
+<body>
 
----
+    <header>
+        <h1>Smart Humidifier V10</h1>
+        <span class="badge">旗舰级交付版本 | 全栈自研硬件</span>
+    </header>
 
-## 📂 核心资源导航
+    <div class="glass-box">
+        <h2 class="section-title">功能运行实拍</h2>
+        <div class="video-wrapper">
+            <video src="images/实物全功能演示视频.mp4" controls poster="images/实机演示_幻彩灯与雾化联动.jpg"></video>
+        </div>
+    </div>
 
-* 📝 **[源码包 (含详细中文注释)](main/)**
-* 📎 **[电路原理图 PDF (自研 V10 版)](Hardware/电路原理图_智能加湿器V10.pdf)**
-* 📦 **[Gerber 生产打板文件](Hardware/Gerber_Smart_Humidifier_V10.zip)**
+    <div class="glass-box">
+        <h2 class="section-title">核心攻坚难点</h2>
+        <div class="tech-list">
+            <div class="tech-item">
+                <h3>🛡️ 动力安全限位</h3>
+                <p>底层驱动强制锁定 108kHz 谐振频率，并将占空比物理硬限位在 45% 以内，彻底根除烧毁 MOS 管隐患。</p>
+            </div>
+            <div class="tech-item">
+                <h3>🔄 矩阵引脚翻转</h3>
+                <p>利用 ESP32-C3 的 UART 路由，代码级实现 TX/RX 引脚动态对调，完美解决天问 51 模块的走线冲突。</p>
+            </div>
+            <div class="tech-item">
+                <h3>⏱️ RMT 硬件时序</h3>
+                <p>采用原生 RMT 硬件接管 WS2812B 发送，摆脱 CPU 软件翻转，确保 FreeRTOS 多任务调度下灯效丝滑。</p>
+            </div>
+        </div>
+    </div>
 
----
-© 2026 Developed by Lelechacc. | 拥抱 AI 协同开发新时代
+    <div class="glass-box">
+        <h2 class="section-title">硬件细节展示</h2>
+        <div class="grid">
+            <div class="img-card">
+                <div class="img-container"><img src="images/3D渲染_正面整体架构.png"></div>
+                <div class="img-info">3D 渲染：正面架构</div>
+            </div>
+            <div class="img-card">
+                <div class="img-container"><img src="images/硬件细节_PCB正面静态图.jpg"></div>
+                <div class="img-info">PCB 实拍：高集成主板</div>
+            </div>
+            <div class="img-card">
+                <div class="img-container"><img src="images/硬件细节_PCB背面与电池保护.jpg"></div>
+                <div class="img-info">背面细节：双重电池保护</div>
+            </div>
+            <div class="img-card">
+                <div class="img-container"><img src="images/系统全貌_主板与全套外设.jpg"></div>
+                <div class="img-info">系统全景：全模块配套</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <a href="https://github.com/Lelechacc/Smart_Humidifier_V2" class="btn">前往 GitHub 仓库</a>
+        <a href="Hardware/电路原理图_智能加湿器V10.pdf" class="btn" style="background: rgba(255,255,255,0.2); color: #fff;">查看 PDF 原理图</a>
+        <p style="margin-top: 20px;">© 2026 Developed by Lelechacc. | 基于 ESP-IDF & FreeRTOS 构建</p>
+    </footer>
+
+</body>
+</html>
