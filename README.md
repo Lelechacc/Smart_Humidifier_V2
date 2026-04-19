@@ -9,7 +9,7 @@
 
 <br>
 
-👉 **[点击这里访问：项目在线演示与全栈技术拆解主页（iMac 极简风格）](https://lelechacc.github.io/Smart_Humidifier_V2/)**
+👉 **[点击这里访问：项目在线演示与全栈技术拆解主页（iMac 极简风格）](https://lelechacc.github.io/SleepMist-ESP32/)**
 
 ---
 
