@@ -3,138 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Humidifier V10 | 旗舰级物联网终端</title>
+    <title>Smart Humidifier V10 | 旗舰级智能物联网加湿器</title>
     <style>
         :root {
-            /* 苹果风格的高级配色 */
-            --glass-bg: rgba(255, 255, 255, 0.3);
-            --glass-heavy: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-heavy: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.35);
             --accent: #007aff;
             --text-dark: #1d1d1f;
-            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --shadow: 0 10px 40px rgba(0,0,0,0.12);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
+            /* 彻底抛弃玄学的 flex，改回最稳定的基础块级布局 */
             display: block;
             margin: 0;
             padding: 60px 20px;
-            /* 修复背景：使用 macOS Sonoma 风格的流体渐变 */
-            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            
+            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+                        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2500&q=80');
+            background-size: cover;
             background-attachment: fixed;
             min-height: 100vh;
             font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
             color: var(--text-dark);
-            overflow-x: hidden;
         }
 
-        /* 流星 Canvas 层 */
-        #backgroundCanvas { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; 
-        }
-
+        /* 👑 宇宙级绝对居中核心容器：不管屏幕多大，它死死定在正中间！ */
         .main-container {
             width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
+            max-width: 1200px;
+            margin: 0 auto; /* 靠左右 margin 自动平分来实现绝对居中 */
             position: relative;
             z-index: 10;
         }
 
-        /* 顶部 Header */
-        .header-section { text-align: center; margin-bottom: 60px; }
-        h1 { font-size: 3.5rem; font-weight: 800; color: #fff; text-shadow: 0 10px 20px rgba(0,0,0,0.1); letter-spacing: -1.5px; }
-        .subtitle { color: rgba(255,255,255,0.9); font-weight: 500; font-size: 1.2rem; margin-top: 10px; }
-        .version-badge { background: #fff; color: var(--accent); padding: 6px 20px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; display: inline-block; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        /* 动态流星 Canvas 图层 */
+        #backgroundCanvas { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            z-index: 1; /* 保证在海浪之上，玻璃框之下 */
+            pointer-events: none; 
+        }
 
-        /* 通用玻璃卡片 */
+        .header-section { text-align: center; margin-bottom: 60px; }
+        h1 { font-size: 3.2rem; font-weight: 800; color: #fff; text-shadow: 0 4px 15px rgba(0,0,0,0.2); letter-spacing: -1px; }
+        .version-badge { background: var(--accent); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.95rem; font-weight: 600; display: inline-block; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); }
+
         .glass-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
             border: 1px solid var(--glass-border);
-            border-radius: 30px;
+            border-radius: 35px;
             box-shadow: var(--shadow);
             padding: 40px;
             margin-bottom: 40px;
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
+        .glass-card:hover { transform: translateY(-5px); }
 
-        .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; }
+        .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; }
         .section-title::before { content: ""; width: 6px; height: 1.8rem; background: var(--accent); border-radius: 3px; }
 
-        /* 视频演示区 */
         .video-wrapper { 
-            width: 100%; max-width: 800px; margin: 0 auto;
+            width: 100%; max-width: 750px; margin: 0 auto;
             background: #000; border-radius: 25px; overflow: hidden; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+            line-height: 0; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
-        video { width: 100%; display: block; }
+        video { width: 100%; height: auto; }
 
-        /* 网格布局 */
-        .grid-tech { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .tech-item { 
-            background: rgba(255,255,255,0.4); 
-            padding: 25px; border-radius: 24px; 
-            border: 1px solid rgba(255,255,255,0.5);
-            transition: 0.3s;
+        .grid-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .grid-tech { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; }
+
+        .img-card { background: rgba(255, 255, 255, 0.3); border-radius: 25px; overflow: hidden; border: 1px solid var(--glass-border); text-align: center; }
+        .img-container { width: 100%; height: 260px; overflow: hidden; background: rgba(255,255,255,0.1); }
+        .img-container img { 
+            width: 100%; height: 100%; object-fit: cover; 
+            display: block; cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .tech-item:hover { transform: translateY(-5px); background: rgba(255,255,255,0.5); }
-        .tech-item h3 { margin-bottom: 12px; font-size: 1.2rem; color: #007aff; }
+        .img-card:hover .img-container img { transform: scale(1.08); }
+        .img-info { padding: 20px; font-weight: 600; font-size: 0.95rem; color: rgba(0,0,0,0.7); font-style: italic; }
+
+        .tech-item { background: rgba(255,255,255,0.25); padding: 25px; border-radius: 22px; border: 1px solid var(--glass-border); }
+        .tech-item h3 { margin-bottom: 12px; font-size: 1.15rem; color: #0056b3; }
         .tech-item p { font-size: 0.95rem; line-height: 1.6; color: #333; }
+        .advantage-badge { background: #fff; color: var(--accent); padding: 2px 6px; border-radius: 5px; font-weight: 600; font-size: 0.8rem; margin-right: 5px; }
 
-        /* 硬件图集区 */
-        .grid-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-        .img-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .img-container { width: 100%; height: 200px; overflow: hidden; }
-        .img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; cursor: zoom-in; }
-        .img-container img:hover { transform: scale(1.1); }
-        .img-info { padding: 15px; font-size: 0.85rem; text-align: center; font-weight: 500; }
+        footer { text-align: center; color: rgba(255,255,255,0.8); margin-top: 20px; }
+        .btn { display: inline-block; padding: 14px 35px; background: #fff; color: var(--accent); text-decoration: none; border-radius: 30px; font-weight: 700; font-size: 1rem; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 10px; }
+        .btn:hover { background: var(--accent); color: #fff; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,122,255,0.2); }
 
-        /* 音乐播放器组件 (iMac 浮动风格) */
-        .music-player {
-            position: fixed; bottom: 30px; right: 30px;
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(15px);
-            padding: 12px 20px; border-radius: 50px;
-            display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.5);
-            z-index: 9999;
+        /* 灯箱遮罩层样式 */
+        .lightbox-overlay {
+            display: none; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); 
+            z-index: 10000; 
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.4s ease;
+            backdrop-filter: blur(10px); cursor: zoom-out; 
         }
-        .music-info { font-size: 13px; font-weight: 600; }
-        .play-btn { 
-            background: var(--accent); color: #fff; border: none; 
-            padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 12px;
+        .lightbox-overlay.active { display: flex; opacity: 1; }
+        .lightbox-image {
+            max-width: 90%; max-height: 90%; border-radius: 10px;
+            box-shadow: 0 15px 60px rgba(0,0,0,0.5);
+            transform: scale(0.9); transition: transform 0.4s ease; cursor: default; 
         }
-
-        /* 按钮 */
-        .btn-group { text-align: center; margin-top: 20px; }
-        .btn { 
-            display: inline-block; padding: 14px 28px; background: var(--accent); color: #fff; 
-            text-decoration: none; border-radius: 50px; font-weight: 600; margin: 10px;
-            transition: 0.3s;
+        .lightbox-overlay.active .lightbox-image { transform: scale(1); }
+        .lightbox-close {
+            position: absolute; top: 20px; right: 30px;
+            color: #fff; font-size: 40px; font-weight: bold;
+            cursor: pointer; transition: color 0.3s;
         }
-        .btn:hover { transform: scale(1.05); box-shadow: 0 10px 20px rgba(0,122,255,0.3); }
-
-        footer { text-align: center; padding: 40px; color: #fff; font-weight: 500; opacity: 0.8; }
+        .lightbox-close:hover { color: #bbb; }
     </style>
 </head>
 <body>
 
     <canvas id="backgroundCanvas"></canvas>
 
-    <div class="music-player">
-        <div class="music-info">🎵 Smart V10 Audio Feedback</div>
-        <audio id="bgMusic" loop>
-            <source src="music/ambient.mp3" type="audio/mpeg">
-        </audio>
-        <button class="play-btn" onclick="toggleMusic()" id="musicBtn">PLAY</button>
+    <div class="main-container">
+
+        <div class="header-section">
+            <h1>Smart Humidifier V10</h1>
+            <div class="subtitle">旗舰级智能物联网加湿器 | ESP32-C3FN4 + FreeRTOS 硬核全栈自研开发</div>
+            <span class="version-badge">Final Release 最终交付版</span>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="section-title">功能运行实拍演示</h2>
+            <div class="video-wrapper">
+                <video src="images/实物全功能演示视频.mp4" controls poster="images/实机演示_幻彩灯与雾化联动.jpg"></video>
+            </div>
+            <p style="text-align: center; font-style: italic; color: rgba(0,0,0,0.7); margin-top: 20px;">V10最终稳定版：完整展示按键、语音、蓝牙、幻彩与超声波雾化功能的协同运行。</p>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="section-title">具体实现了哪些功能？ (干货拆解)</h2>
+            <div class="grid-tech">
+                <div class="tech-item">
+                    <h3>🌫️ 多模态雾化控制</h3>
+                    <p>基于物理按键的长/短按，系统可在四个状态间精准流转：待机 (Off)、持续大雾 (High)、静音小雾 (Low) 以及间歇喷雾 (喷3秒停3秒)。</p>
+                </div>
+                <div class="tech-item">
+                    <h3>🗣️ 离线语音绝对指令</h3>
+                    <p>接入天问 ASRPRO 模块。通过串口接收特定指令集，可无视当前按键状态，直接通过语音口令强制跳转到大雾或间歇模式。</p>
+                </div>
+                <div class="tech-item">
+                    <h3>🌈 WS2812B 状态同步反馈</h3>
+                    <p>利用原生 RMT 外设硬件接口发送纳秒级时序。不同雾化模式对应不同的马卡龙色系动态流光反馈，提供高阶视觉体验。</p>
+                </div>
+                <div class="tech-item">
+                    <h3>📱 原生蓝牙 (BLE) 控制</h3>
+                    <p>代码底层已初始化 BLE 协议栈，支持广播原生服务。为后续开发小程序进行动态雾量曲线调节打下基础。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="section-title">硬件选型与电源管理 (Hardware Lifecycle)</h2>
+            <div class="grid-tech">
+                <div class="tech-item">
+                    <h3>🧠 MCU 通信大脑</h3>
+                    <p><span class="badge">主控</span> ESP32-C3FN4。<br>集成了 4MB Flash，支持 Wi-Fi & BLE 5.0，负责全局 FreeRTOS 多任务任务调度与事件处理。</p>
+                </div>
+                <div class="tech-item">
+                    <h3>🔋 充放电与保护电路</h3>
+                    <p><span class="badge">充电</span> TC4056A 线性充电 IC。<br><span class="badge">保护</span> XB5306A 一体化保护 IC，提供鋰電池過充、過放與短路三重物理保護，确保设备安全。</p>
+                </div>
+                <div class="tech-item">
+                    <h3>⚡ 雾化谐振驱动模块</h3>
+                    <p><span class="badge">驱动</span> AO3400 N沟道增强型 MOS 管。<br>配合大功率电感，承载底层 108kHz 的高频 PWM 信号，实现微孔雾化片的谐振。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="section-title">攻克了哪些底层技术痛点？</h2>
+            <div class="grid-tech">
+                <div class="tech-item">
+                    <h3>🛡️ 硬件级動力安全保護</h3>
+                    <p><span class="advantage-badge">软硬限位</span> 底层代码强制限定 LEDC 外设 PWM 占空比在 **45% (数值135)** 以下。彻底消除前期版本 MOS 管和电感烧毁隐患，赋予 V10 工业级稳定性。</p>
+                </div>
+                <div class="tech-item">
+                    <h3>🔄 矩阵路由解决走线冲突</h3>
+                    <p><span class="advantage-badge">矩阵互联</span> ASRPRO 模块TX强制为PA2，与 PCB 硬件布线交叉矛盾。利用 ESP32-C3 的 GPIO 矩阵路由特性，实现 TX/RX 引脚职责的代码层动态对调。</p>
+                </div>
+                <div class="tech-item">
+                    <h3>⏱️ 0 CPU占用 RMT 色彩驅動</h3>
+                    <p><span class="advantage-badge">硬件加速</span> 放棄常規軟件翻轉 GPIO 写法。引入原生 RMT 外设，纳秒级色彩数据直接填入硬件缓存，由硬件发送波形，主循环 0 占用。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="section-title">硬件全栈设计图集 (全栈自研硬核，点击图片放大)</h2>
+            <div class="grid-gallery">
+                <div class="img-card"><div class="img-container"><img src="images/3D渲染_正面整体架构.png" class="lightbox"></div><div class="img-info">3D正面整体架构 (JLC EDA)</div></div>
+                <div class="img-card"><div class="img-container"><img src="images/硬件细节_PCB正面静态图.jpg" class="lightbox"></div><div class="img-info">PCB正面高度集成主板静态图</div></div>
+                <div class="img-card"><div class="img-container"><img src="images/硬件细节_PCB背面与电池保护.jpg" class="lightbox"></div><div class="img-info">PCB背面：XB5306A 电池保护电路细节</div></div>
+                <div class="img-card"><div class="img-container"><img src="images/系统全貌_主板与全套外设.jpg" class="lightbox"></div><div class="img-info">V10系统全套配件全貌</div></div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h2 class="section-title">开发工具链与开源打板资料下载</h2>
+            <div class="grid-2">
+                 <div class="img-card"><div class="img-container" style="height: auto; max-height: 250px;"><img src="images/开发工具_天问51语音配置.png" class="lightbox" style="height: auto; max-height: 250px;"></div><div class="img-info">离线语音模块工具链 (天问 ASRPRO)</div></div>
+                
+                <div class="tech-item" style="background: rgba(0,122,255,0.05); text-align: center; border: 1px solid var(--glass-border);">
+                    <h3 style="color: var(--accent); margin-bottom: 25px; font-weight: 700;">旗舰版核心资料库 (点此一键下载)</h3>
+                    <a href="https://github.com/Lelechacc/Smart_Humidifier_V2/releases/download/v10.0/Gerber_Smart_Humidifier_V10.zip" class="btn">📦 Gerber 打板文件包 (.zip)</a>
+                    <a href="https://github.com/Lelechacc/Smart_Humidifier_V2/releases/download/v10.0/_.V10_SCH_Schematic1_2026-03-26.pdf" class="btn">📎 电路原理图 PDF</a>
+                    <a href="https://github.com/Lelechacc/Smart_Humidifier_V2/releases/download/v10.0/Smart_Humidifier_V10.eprj" class="btn">🛠️ 嘉立创工程原文件 (.eprj)</a>
+                    <p style="margin-top: 20px; font-size: 0.85rem; color: #555;">包含完整的底层代码与硬件设计图纸。</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2026 Developed by Lelechacc. | 专注嵌入式底层研发 | V10 Final Release</p>
+        </footer>
+
+    </div> <div id="lightboxOverlay" class="lightbox-overlay">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImage" class="lightbox-image" src="" alt="放大后的硬件细节图片">
     </div>
 
-    <div class="main-container">
-        <header class="header-section">
-            <h1>Smart Humidifier V10</h1>
-            <div class="subtitle">基于 ESP32-C3 + FreeRTOS 的异步协作物联网终端</div>
-            <span class="version-badge
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // A. 动态流星 Canvas 脚本
+            const canvas = document.getElementById('backgroundCanvas');
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+            const meteors = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            function initStars() {
+                stars = [];
+                for (let i = 0; i < 80; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 1.5,
+                        alpha: Math.random(),
+                        blinkSpeed: Math.random() * 0.01 + 0.005
+                    });
+                }
+            }
+            initStars();
+
+            function createMeteor() {
+                const angle = Math.random() * Math.PI / 4 + Math.PI / 8; 
+                const length = Math.random() * 100 + 150; 
+                meteors.push({
+                    x: Math.random() * canvas.width * 1.5 - canvas.width * 0.25,
+                    y: -100,
+                    length: length,
+                    dx: Math.cos(angle) * 15,
+                    dy: Math.sin(angle) * 15,
+                    opacity: 1
+                });
+            }
+            setInterval(createMeteor, Math.random() * 3000 + 3000);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                stars.forEach(star => {
+                    star.alpha += star.blinkSpeed;
+                    if (star.alpha > 1 || star.alpha < 0) {
+                        star.blinkSpeed = -star.blinkSpeed;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, star.alpha)})`;
+                    ctx.fill();
+                });
+
+                for (let i = meteors.length - 1; i >= 0; i--) {
+                    const meteor = meteors[i];
+                    meteor.x += meteor.dx;
+                    meteor.y += meteor.dy;
+                    meteor.opacity -= 0.01; 
+
+                    const gradient = ctx.createLinearGradient(
+                        meteor.x, meteor.y, 
+                        meteor.x - meteor.dx, meteor.y - meteor.dy
+                    );
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${meteor.opacity})`);
+                    gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+                    
+                    ctx.beginPath();
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(meteor.x, meteor.y);
+                    ctx.lineTo(meteor.x - meteor.length, meteor.y - meteor.length * (meteor.dy/meteor.dx));
+                    ctx.stroke();
+
+                    if (meteor.opacity < 0 || meteor.y > canvas.height) {
+                        meteors.splice(i, 1);
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            // B. 灯箱交互脚本
+            const overlay = document.getElementById('lightboxOverlay');
+            const largeImage = document.getElementById('lightboxImage');
+            const closeBtn = document.querySelector('.lightbox-close');
+            const galleryImages = document.querySelectorAll('.lightbox');
+
+            galleryImages.forEach(image => {
+                image.addEventListener('click', () => {
+                    largeImage.src = image.src; 
+                    overlay.classList.add('active'); 
+                });
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target !== largeImage) { 
+                    overlay.classList.remove('active');
+                }
+            });
+
+            closeBtn.addEventListener('click', () => {
+                overlay.classList.remove('active');
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && overlay.classList.contains('active')) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
